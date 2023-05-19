@@ -19,9 +19,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float crouchYScale;
     private float startYScale;
 
-
     [Header("Ground Check")]
-    [SerializeField] private float playerHeight;
+    //[SerializeField] private float playerHeight;
+    [SerializeField] Transform groundCheck;
+    [SerializeField] float groundDistance = 0.4f;
     [SerializeField] private LayerMask whatIsGround;
     private bool grounded;
 
@@ -150,7 +151,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void CheckGround()
     {
-        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
+        grounded = Physics.CheckSphere(groundCheck.position, groundDistance, whatIsGround);
+        //grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.75f + 0.1f, whatIsGround);
     }
 
     private void HandleDrag()
@@ -200,7 +202,7 @@ public class PlayerMovement : MonoBehaviour
 
     private bool OnSlope()
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerHeight * 0.5f + 0.3f))
+        if (Physics.Raycast(transform.position, Vector3.down, out slopeHit, 0.5f))
         {
             float angle = Vector3.Angle(Vector3.up, slopeHit.normal);
             return angle < maxSlopeAngle && angle != 0;

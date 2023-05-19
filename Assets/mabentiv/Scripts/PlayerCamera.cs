@@ -7,7 +7,7 @@ public class PlayerCamera : MonoBehaviour
     [SerializeField] private float sensX;
     [SerializeField] private float sensY;
 
-    [SerializeField] private Transform orientation;
+    [SerializeField] private Transform playerBody;
 
     private float xRotation;
     private float yRotation;
@@ -28,7 +28,7 @@ public class PlayerCamera : MonoBehaviour
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
-        transform.rotation = Quaternion.Euler(xRotation, yRotation, 0);
-        orientation.rotation = Quaternion.Euler(0, yRotation, 0);
+        transform.rotation = Quaternion.Euler(xRotation, yRotation, 0f);
+        playerBody.Rotate(Vector3.up * mouseX);
     }
 }
