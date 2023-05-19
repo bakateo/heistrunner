@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -5,7 +6,14 @@ public class PlayerMovement : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float walkSpeed;
     [SerializeField] private float sprintSpeed;
+    [SerializeField] private float slidingSpeed;
+    [SerializeField] private float speedIncreaseMultiplier;
+    [SerializeField] private float slopeIncreaseMultiplier;
     [SerializeField] private float groundDrag;
+    public bool sliding;
+
+    private float desiredMoveSpeed;
+    private float lastDesiredMoveSpeed;
     private float moveSpeed;
 
     [Header("Jumping")]
@@ -14,17 +22,19 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float airMultiplier;
     private bool readyToJump;
 
-    [Header("Crouching")]
-    [SerializeField] private float crouchSpeed;
-    [SerializeField] private float crouchYScale;
-    private float startYScale;
-
     [Header("Ground Check")]
     //[SerializeField] private float playerHeight;
     [SerializeField] Transform groundCheck;
     [SerializeField] float groundDistance = 0.4f;
     [SerializeField] private LayerMask whatIsGround;
     private bool grounded;
+
+    [Header("Crouching")]
+    [SerializeField] private float crouchSpeed;
+    [SerializeField] private float crouchYScale;
+    private float startYScale;
+
+    [Header("Sliding")]
 
     [Header("Slope Handling")]
     [SerializeField] private float maxSlopeAngle;
@@ -40,10 +50,7 @@ public class PlayerMovement : MonoBehaviour
 
     private float horizontalInput;
     private float verticalInput;
-
-
     private Vector3 moveDirection;
-
     private Rigidbody rb;
 
     [SerializeField] MovementState state;
@@ -52,6 +59,7 @@ public class PlayerMovement : MonoBehaviour
         walking,
         sprinting,
         crouching,
+        sliding,
         air
     }
 
@@ -105,28 +113,76 @@ public class PlayerMovement : MonoBehaviour
 
     private void StateHandler()
     {
-        if (Input.GetKey(crouchKey) && grounded)
+        if (sliding)
         {
-            state = MovementState.crouching;
-            moveSpeed = crouchSpeed;
+            state = MovementState.sliding;
+
+            if (OnSlope() && rb.velocity.y < 0.1f)
+                desiredMoveSpeed = slidingSpeed;
+            else
+                desiredMoveSpeed = sprintSpeed;
         }
 
-        if (Input.GetKey(sprintKey) && grounded)
+        else if (Input.GetKey(crouchKey) && grounded)
+        {
+            state = MovementState.crouching;
+            desiredMoveSpeed = crouchSpeed;
+        }
+
+        else if (Input.GetKey(sprintKey) && grounded)
         {
             state = MovementState.sprinting;
-            moveSpeed = sprintSpeed;
+            desiredMoveSpeed = sprintSpeed;
         }
 
         else if (grounded)
         {
             state = MovementState.walking;
-            moveSpeed = walkSpeed;
+            desiredMoveSpeed = walkSpeed;
         }
 
         else
         {
             state = MovementState.air;
         }
+
+        if (Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f && moveSpeed != 0)
+        {
+            StopAllCoroutines();
+            StartCoroutine(SmoothlyLerpMoveSpeed());
+        }
+        else
+        {
+            moveSpeed = desiredMoveSpeed;
+        }
+
+        lastDesiredMoveSpeed = desiredMoveSpeed;
+    }
+
+    private IEnumerator SmoothlyLerpMoveSpeed()
+    {
+        float time = 0;
+        float difference = Mathf.Abs(desiredMoveSpeed - moveSpeed);
+        float startValue = moveSpeed;
+
+        while(time < difference)
+        {
+            moveSpeed = Mathf.Lerp(startValue, desiredMoveSpeed, time / difference);
+
+            if (OnSlope())
+            {
+                float slopeAngle = Vector3.Angle(Vector3.up, slopeHit.normal);
+                float slopeAngleIncrease = 1 + (slopeAngle / 99f);
+
+                time += Time.deltaTime * speedIncreaseMultiplier * slopeIncreaseMultiplier * slopeAngleIncrease;
+            }
+            else 
+                time += Time.deltaTime * speedIncreaseMultiplier;
+
+            yield return null;
+        }
+
+        moveSpeed = desiredMoveSpeed;
     }
 
     private void MovePlayer()
@@ -135,7 +191,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (OnSlope() && !exitingSlope)
         {
-            rb.AddForce(GetSlopeMoveDirection() * moveSpeed * 20f, ForceMode.Force);
+            rb.AddForce(GetSlopeMoveDirection(moveDirection) * moveSpeed * 20f, ForceMode.Force);
 
             if (rb.velocity.y > 0)
                 rb.AddForce(Vector3.down * 80f, ForceMode.Force);
@@ -200,7 +256,7 @@ public class PlayerMovement : MonoBehaviour
         exitingSlope = false;
     }
 
-    private bool OnSlope()
+    public bool OnSlope()
     {
         if (Physics.Raycast(transform.position, Vector3.down, out slopeHit, 0.5f))
         {
@@ -210,8 +266,8 @@ public class PlayerMovement : MonoBehaviour
         return false;
     }
 
-    private Vector3 GetSlopeMoveDirection()
+    public Vector3 GetSlopeMoveDirection(Vector3 direction)
     {
-        return Vector3.ProjectOnPlane(moveDirection, slopeHit.normal).normalized;
+        return Vector3.ProjectOnPlane(direction, slopeHit.normal).normalized;
     }
 }
