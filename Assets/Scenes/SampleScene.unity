@@ -2323,8 +2323,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 40, y: 0.25, z: 40}
-  m_Center: {x: 0, y: 0.125, z: 0}
+  m_Size: {x: 40, y: 0.25, z: 60}
+  m_Center: {x: 0, y: 0.125, z: 10}
 --- !u!43 &379789879
 Mesh:
   m_ObjectHideFlags: 0
@@ -2762,7 +2762,6 @@ GameObject:
   - component: {fileID: 753477655}
   - component: {fileID: 753477659}
   - component: {fileID: 753477660}
-  - component: {fileID: 753477661}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -2817,13 +2816,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21d380ece27940e4a8db483b131ecba8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkSpeed: 3
-  sprintSpeed: 7
-  slidingSpeed: 9
+  walkSpeed: 7
+  sprintSpeed: 10
   speedIncreaseMultiplier: 1.5
   slopeIncreaseMultiplier: 2.5
   groundDrag: 4
-  sliding: 0
+  slidingSpeed: 30
+  maxSlideTime: 0.75
+  slideForce: 200
+  slideYScale: 0.5
   jumpForce: 12
   jumpCooldown: 0.25
   airMultiplier: 0.4
@@ -2839,24 +2840,8 @@ MonoBehaviour:
   jumpKey: 32
   sprintKey: 304
   crouchKey: 99
-  state: 0
---- !u!114 &753477661
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 753477654}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3de879926c5bfe4193e85dfc531e941, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  orientation: {fileID: 1597555119}
-  maxSlideTime: 0.75
-  slideForce: 200
-  slideYScale: 0.5
   slideKey: 306
+  state: 0
 --- !u!43 &1116314357
 Mesh:
   m_ObjectHideFlags: 0
