@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -37,7 +38,9 @@ public class PlayerMovement : MonoBehaviour
     [Header("Crouching")]
     [SerializeField] private float crouchSpeed;
     [SerializeField] private float crouchYScale;
+    private RaycastHit ceilingHit;
     private float startYScale;
+    private bool stillCrouching;
 
     [Header("Slope Handling")]
     [SerializeField] private float maxSlopeAngle;
@@ -59,6 +62,7 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] MovementState state;
     private enum MovementState
+    //states in klassen umändern
     {
         walking,
         sprinting,
@@ -73,6 +77,7 @@ public class PlayerMovement : MonoBehaviour
         rb.freezeRotation = true;
         readyToJump = true;
         grounded = false;
+        stillCrouching = false;
         startYScale = transform.localScale.y;
 
     }
@@ -97,31 +102,33 @@ public class PlayerMovement : MonoBehaviour
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
 
-        if (Input.GetKey(jumpKey) && readyToJump && grounded)
+        //Jumping
+        if (Input.GetKey(jumpKey) && readyToJump && grounded && !stillCrouching)
         {
             readyToJump = false;
+            ResetCrouch();
             Jump();
             Invoke(nameof(ResetJump), jumpCooldown);
+
         }
+        //Crouching
         if (Input.GetKeyDown(crouchKey))
-        {
-            transform.localScale = new Vector3(transform.localScale.x, crouchYScale, transform.localScale.z);
-            rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
-        }
+            Crouch();
+
         if (Input.GetKeyUp(crouchKey))
-            transform.localScale = new Vector3(transform.localScale.x, startYScale, transform.localScale.z);
+            if(!stillCrouching)
+                ResetCrouch();
 
-
-        if (Input.GetKeyDown(slideKey) && (horizontalInput != 0 || verticalInput != 0))
+        //Sliding
+        if (Input.GetKeyDown(slideKey) && (horizontalInput != 0 || verticalInput != 0) && !stillCrouching)
             StartSlide();
         if (Input.GetKeyUp(slideKey) && sliding)
             StopSlide();
-
     }
 
     private void StateHandler()
     {
-        if (sliding)
+        if (sliding && !stillCrouching)
         {
             state = MovementState.sliding;
 
@@ -137,23 +144,23 @@ public class PlayerMovement : MonoBehaviour
             desiredMoveSpeed = crouchSpeed;
         }
 
-        else if (Input.GetKey(sprintKey) && grounded)
+        else if (Input.GetKey(sprintKey) && grounded && !stillCrouching)
         {
             state = MovementState.sprinting;
             desiredMoveSpeed = sprintSpeed;
         }
 
-        else if (grounded)
+        else if (grounded && !stillCrouching)
         {
             state = MovementState.walking;
             desiredMoveSpeed = walkSpeed;
-        
-        } else {
+
+        } else if(!grounded && !stillCrouching){
 
             state = MovementState.air;
         }
 
-        if (Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f && moveSpeed != 0)
+        if (Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 7f && moveSpeed != 0)
         {
             StopAllCoroutines();
             StartCoroutine(SmoothlyLerpMoveSpeed());
@@ -170,7 +177,7 @@ public class PlayerMovement : MonoBehaviour
         float difference = Mathf.Abs(desiredMoveSpeed - moveSpeed);
         float startValue = moveSpeed;
 
-        while(time < difference)
+        while (time < difference)
         {
             moveSpeed = Mathf.Lerp(startValue, desiredMoveSpeed, time / difference);
 
@@ -181,7 +188,7 @@ public class PlayerMovement : MonoBehaviour
 
                 time += Time.deltaTime * speedIncreaseMultiplier * slopeIncreaseMultiplier * slopeAngleIncrease;
             }
-            else 
+            else
                 time += Time.deltaTime * speedIncreaseMultiplier;
 
             yield return null;
@@ -218,7 +225,6 @@ public class PlayerMovement : MonoBehaviour
     private void CheckGround()
     {
         grounded = Physics.CheckSphere(groundCheck.position, groundDistance, whatIsGround);
-        //grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.75f + 0.1f, whatIsGround);
     }
 
     private void HandleDrag()
@@ -262,8 +268,48 @@ public class PlayerMovement : MonoBehaviour
     private void ResetJump()
     {
         readyToJump = true;
-
+        transform.localScale = new Vector3(transform.localScale.x, startYScale, transform.localScale.z);
         exitingSlope = false;
+    }
+
+    private bool UnderCeiling()
+    {
+        if (Physics.Raycast(transform.position, Vector3.up, out ceilingHit, 1f))
+        {
+            stillCrouching = true;
+            return true;
+        }
+
+        else
+        {
+            stillCrouching = false;
+            ResetCrouch();
+            return false;
+        }
+    }
+
+    private void StartCeilingCheck()
+    {
+        while (stillCrouching)
+        {
+            if (UnderCeiling())
+                continue;
+            else
+                stillCrouching = false;
+                return;
+        }
+    }
+
+    private void Crouch()
+    {
+        transform.localScale = new Vector3(transform.localScale.x, crouchYScale, transform.localScale.z);
+        rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
+    }
+
+    private void ResetCrouch()
+    {
+        stillCrouching = false;
+        transform.localScale = new Vector3(transform.localScale.x, startYScale, transform.localScale.z);
     }
 
     private bool OnSlope()
