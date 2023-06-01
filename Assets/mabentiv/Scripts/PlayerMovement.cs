@@ -201,6 +201,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void MovePlayer()
     {
+        if (sliding)
+            SlidingMovement();
+
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
 
@@ -218,9 +221,6 @@ public class PlayerMovement : MonoBehaviour
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
 
         rb.useGravity = !OnSlope();
-
-        if (sliding)
-            SlidingMovement();
 
     }
 
