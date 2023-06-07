@@ -29,7 +29,6 @@ public class PlayerMovement : MonoBehaviour
     private bool readyToJump;
 
     [Header("Ground Check")]
-    //[SerializeField] private float playerHeight;
     [SerializeField] Transform groundCheck;
     [SerializeField] float groundDistance = 0.4f;
     [SerializeField] private LayerMask whatIsGround;
@@ -133,7 +132,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void StateHandler()
     {
-        if (sliding && !stillCrouching)
+        if (sliding && !stillCrouching && !state.Equals(MovementState.air))
         {
             state = MovementState.sliding;
 
