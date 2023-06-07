@@ -169,7 +169,9 @@ public class PlayerMovement : MonoBehaviour
         {
             StopAllCoroutines();
             StartCoroutine(SmoothlyLerpMoveSpeed());
+
         } else {
+
             moveSpeed = desiredMoveSpeed;
         }
 
