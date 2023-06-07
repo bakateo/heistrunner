@@ -1,18 +1,18 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.UI;
+using TMPro;
 
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float walkSpeed;
     [SerializeField] private float sprintSpeed;
-    [SerializeField] private float speedIncreaseMultiplier;
-    [SerializeField] private float slopeIncreaseMultiplier;
     [SerializeField] private float groundDrag;
+    [SerializeField] private float wallrunSpeed;
     private float desiredMoveSpeed;
     private float lastDesiredMoveSpeed;
-    private float moveSpeed;
 
     [Header("Sliding")]
     [SerializeField] private float slidingSpeed;
@@ -20,7 +20,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float slideForce;
     [SerializeField] private float slideYScale;
     private float slideTimer;
-    private bool sliding;
 
     [Header("Jumping")]
     [SerializeField] private float jumpForce;
@@ -32,15 +31,14 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] Transform groundCheck;
     [SerializeField] float groundDistance = 0.4f;
     [SerializeField] private LayerMask whatIsGround;
-    private bool grounded;
 
     [Header("Crouching")]
     [SerializeField] private float crouchSpeed;
     [SerializeField] private float crouchYScale;
-    private RaycastHit ceilingHit;
     private bool underCeiling;
-    private float startYScale;
     private bool stillCrouching;
+    private RaycastHit ceilingHit;
+    private float startYScale;
 
     [Header("Slope Handling")]
     [SerializeField] private float maxSlopeAngle;
@@ -55,17 +53,25 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private KeyCode crouchKey = KeyCode.C;
     [SerializeField] private KeyCode slideKey = KeyCode.LeftControl;
 
+    [Header("UI Logging")]
+    [SerializeField] private TextMeshProUGUI moveSpeedText;
+    [SerializeField] private float moveSpeed;
+
     private float horizontalInput;
     private float verticalInput;
     private Vector3 moveDirection;
     private Rigidbody rb;
 
     [SerializeField] MovementState state;
+    private bool sliding;
+    private bool grounded;
+    public bool wallrunning;
     private enum MovementState
     //states in klassen umändern
     {
         walking,
         sprinting,
+        wallrunning,
         crouching,
         sliding,
         air
@@ -77,6 +83,7 @@ public class PlayerMovement : MonoBehaviour
         rb.freezeRotation = true;
         readyToJump = true;
         grounded = false;
+        wallrunning = false;
         stillCrouching = false;
         underCeiling = false;
         startYScale = transform.localScale.y;
@@ -91,6 +98,7 @@ public class PlayerMovement : MonoBehaviour
             CheckCeiling();
         StateHandler();
         SpeedControl();
+        moveSpeedText.text = desiredMoveSpeed.ToString();
         HandleDrag();
     }
 
@@ -132,7 +140,13 @@ public class PlayerMovement : MonoBehaviour
 
     private void StateHandler()
     {
-        if (sliding && !stillCrouching && !state.Equals(MovementState.air))
+        if (wallrunning)
+        {
+            state = MovementState.wallrunning;
+            desiredMoveSpeed = wallrunSpeed;
+        }
+
+        else if (sliding && !stillCrouching && grounded)
         {
             state = MovementState.sliding;
 
@@ -164,7 +178,7 @@ public class PlayerMovement : MonoBehaviour
             state = MovementState.air;
         }
 
-        if (Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 7f && moveSpeed != 0)
+        if (Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f && moveSpeed != 0)
         {
             StopAllCoroutines();
             StartCoroutine(SmoothlyLerpMoveSpeed());
@@ -187,18 +201,9 @@ public class PlayerMovement : MonoBehaviour
         while (time < difference)
         {
             moveSpeed = Mathf.Lerp(startValue, desiredMoveSpeed, time / difference);
-
-            if (OnSlope())
-            {
-                float slopeAngle = Vector3.Angle(Vector3.up, slopeHit.normal);
-                float slopeAngleIncrease = 1 + (slopeAngle / 99f);
-
-                time += Time.deltaTime * speedIncreaseMultiplier * slopeIncreaseMultiplier * slopeAngleIncrease;
-            }
-            else
-                time += Time.deltaTime * speedIncreaseMultiplier;
-
+            time += Time.deltaTime;
             yield return null;
+
         }
 
         moveSpeed = desiredMoveSpeed;
