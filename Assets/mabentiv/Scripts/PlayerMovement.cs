@@ -107,7 +107,7 @@ public class PlayerMovement : MonoBehaviour
         verticalInput = Input.GetAxisRaw("Vertical");
 
         //Jumping
-        if (Input.GetKey(jumpKey) && readyToJump && grounded && !underCeiling)
+        if (Input.GetKey(jumpKey) && readyToJump && grounded && !CheckCeiling())
         {
             readyToJump = false;
             ResetCrouch();
@@ -116,9 +116,9 @@ public class PlayerMovement : MonoBehaviour
 
         }
         //Crouching
-        if (Input.GetKeyDown(crouchKey))
+        if (Input.GetKeyDown(crouchKey) && grounded)
             Crouch();
-        if (Input.GetKeyUp(crouchKey) && !CheckCeiling())
+        if (Input.GetKeyUp(crouchKey) && grounded && !CheckCeiling())
             ResetCrouch();
 
         //Sliding
@@ -126,6 +126,9 @@ public class PlayerMovement : MonoBehaviour
             StartSlide();
         if (Input.GetKeyUp(slideKey) && sliding)
             StopSlide();
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+            Application.Quit();
     }
 
     private void StateHandler()
@@ -173,6 +176,7 @@ public class PlayerMovement : MonoBehaviour
         lastDesiredMoveSpeed = desiredMoveSpeed;
     }
 
+    //TO-DO: change to Mathf.SmoothDamp()
     private IEnumerator SmoothlyLerpMoveSpeed()
     {
         float time = 0;
