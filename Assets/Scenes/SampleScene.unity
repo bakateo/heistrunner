@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.11266087, g: 0.10065464, b: 0.18526588, a: 1}
+  m_IndirectSpecularColor: {r: 0.053194776, g: 0.06279093, b: 0.11159849, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -7364,15 +7364,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21d380ece27940e4a8db483b131ecba8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkSpeed: 7
-  sprintSpeed: 12
-  groundDrag: 10
-  wallrunSpeed: 8
-  slidingSpeed: 18
+  walkSpeed: 8
+  sprintSpeed: 10
+  groundDrag: 9
+  wallrunSpeed: 9
+  slidingSpeed: 16
   maxSlideTime: 0.75
   slideForce: 200
   slideYScale: 0.5
-  jumpForce: 14
+  jumpForce: 13
   jumpCooldown: 0.75
   airMultiplier: 0.4
   groundCheck: {fileID: 1294146453}
@@ -7380,7 +7380,7 @@ MonoBehaviour:
   isGround:
     serializedVersion: 2
     m_Bits: 1024
-  crouchSpeed: 3.5
+  crouchSpeed: 4.5
   crouchYScale: 0.5
   maxSlopeAngle: 40
   orientation: {fileID: 1597555119}
@@ -7416,11 +7416,11 @@ MonoBehaviour:
     m_Bits: 1024
   wallRunForce: 200
   wallJumpUpForce: 7
-  wallJumpSideForce: 12
-  maxWallRunTime: 2
+  wallJumpSideForce: 14
+  maxWallRunTime: 2.5
   jumpKey: 32
   wallCheckDistance: 1
-  minJumpHeight: 0.8
+  minJumpHeight: 0.9
   exitWallTime: 0.3
   useGravity: 1
   gravityCounterForce: 28
@@ -7448,7 +7448,7 @@ MonoBehaviour:
   holdingLedge: 0
   jumpKey: 32
   ledgeJumpForwardForce: 14
-  ledgeJumpUpwardForce: 10
+  ledgeJumpUpwardForce: 12
   ledgeDetectionLength: 1
   ledgeSphereCastRadius: 0.3
   isLedge:
@@ -7474,9 +7474,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 5120
   lr: {fileID: 1904431988}
-  maxGrappleDistance: 25
-  grappleDelayTime: 0.25
-  overshootYAxis: 2
+  maxGrappleDistance: 30
+  grappleDelayTime: 0.3
+  overshootYAxis: 5
   grapplingCoolDown: 1
   grappleKey: 324
 --- !u!1 &779995420
