@@ -178,36 +178,12 @@ public class PlayerMovement : MonoBehaviour
             state = MovementState.air;
         }
 
-        if (Mathf.Abs(desiredMoveSpeed - lastDesiredMoveSpeed) > 4f && moveSpeed != 0)
-        {
-            StopAllCoroutines();
-            StartCoroutine(SmoothlyLerpMoveSpeed());
-
-        } else {
-
-            moveSpeed = desiredMoveSpeed;
-        }
+        moveSpeed = desiredMoveSpeed;
 
         lastDesiredMoveSpeed = desiredMoveSpeed;
     }
 
     //TO-DO: change to Mathf.SmoothDamp()
-    private IEnumerator SmoothlyLerpMoveSpeed()
-    {
-        float time = 0;
-        float difference = Mathf.Abs(desiredMoveSpeed - moveSpeed);
-        float startValue = moveSpeed;
-
-        while (time < difference)
-        {
-            moveSpeed = Mathf.Lerp(startValue, desiredMoveSpeed, time / difference);
-            time += Time.deltaTime;
-            yield return null;
-
-        }
-
-        moveSpeed = desiredMoveSpeed;
-    }
 
     private void MovePlayer()
     {
@@ -230,7 +206,7 @@ public class PlayerMovement : MonoBehaviour
         else if (!grounded)
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
 
-        rb.useGravity = !OnSlope();
+        if(!wallrunning) rb.useGravity = !OnSlope();
 
     }
 
