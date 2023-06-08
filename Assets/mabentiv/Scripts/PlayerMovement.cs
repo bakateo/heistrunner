@@ -123,7 +123,7 @@ public class PlayerMovement : MonoBehaviour
         verticalInput = Input.GetAxisRaw("Vertical");
 
         //Jumping
-        if (Input.GetKey(jumpKey) && readyToJump && !CheckCeiling())
+        if (Input.GetKey(jumpKey) && readyToJump && !CheckCeiling() && (grounded || freeze))
         {
             readyToJump = false;
             ResetCrouch();

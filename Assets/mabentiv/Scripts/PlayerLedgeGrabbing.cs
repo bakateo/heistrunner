@@ -60,12 +60,9 @@ public class PlayerLedgeGrabbing : MonoBehaviour
             FreezeRbOnLedge();
             timeOnLedge += Time.deltaTime;
 
-            if (timeOnLedge > minTimeOnLedge && anyInputKeyPressed) 
-                ExitLedgeHold();
-
-           
-            if (Input.GetKeyDown(jumpKey))
+            if (timeOnLedge > minTimeOnLedge && Input.GetKeyDown(jumpKey))
                 LedgeJump();
+              
         }
 
         else if (exitingLedge) 
