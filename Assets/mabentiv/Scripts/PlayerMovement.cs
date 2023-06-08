@@ -30,7 +30,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Ground Check")]
     [SerializeField] Transform groundCheck;
     [SerializeField] float groundDistance = 0.4f;
-    [SerializeField] private LayerMask whatIsGround;
+    [SerializeField] private LayerMask isGround;
 
     [Header("Crouching")]
     [SerializeField] private float crouchSpeed;
@@ -64,11 +64,20 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] MovementState state;
     private bool sliding;
+    
     private bool grounded;
+    
     public bool wallrunning;
+
+    public bool freeze;
+    public bool unlimited;
+    public bool restricted;
+
     private enum MovementState
     //states in klassen umändern
     {
+        freeze,
+        unlimited,
         walking,
         sprinting,
         wallrunning,
@@ -114,7 +123,7 @@ public class PlayerMovement : MonoBehaviour
         verticalInput = Input.GetAxisRaw("Vertical");
 
         //Jumping
-        if (Input.GetKey(jumpKey) && readyToJump && grounded && !CheckCeiling())
+        if (Input.GetKey(jumpKey) && readyToJump && !CheckCeiling())
         {
             readyToJump = false;
             ResetCrouch();
@@ -140,7 +149,19 @@ public class PlayerMovement : MonoBehaviour
 
     private void StateHandler()
     {
-        if (wallrunning)
+        if (freeze && !grounded)
+        {
+            state = MovementState.freeze;
+            rb.velocity = Vector3.zero;
+
+        } else if (unlimited)
+        {
+            state = MovementState.unlimited;
+            moveSpeed = 999f;
+            return;
+        }
+
+        else if (wallrunning && !grounded)
         {
             state = MovementState.wallrunning;
             desiredMoveSpeed = wallrunSpeed;
@@ -187,6 +208,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void MovePlayer()
     {
+        if (restricted) return;
+
         if (sliding)
             SlidingMovement();
 
@@ -212,7 +235,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void CheckGround()
     {
-        grounded = Physics.CheckSphere(groundCheck.position, groundDistance, whatIsGround);
+        grounded = Physics.CheckSphere(groundCheck.position, groundDistance, isGround);
     }
 
     private void HandleDrag()

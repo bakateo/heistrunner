@@ -41,11 +41,13 @@ public class PlayerWallRunning : MonoBehaviour
     [SerializeField] PlayerCamera cam;
     private PlayerMovement pm;
     private Rigidbody rb;
+    private PlayerLedgeGrabbing lg;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
         pm = GetComponent<PlayerMovement>();
+        lg = GetComponent<PlayerLedgeGrabbing>();
 
     }
 
@@ -76,8 +78,13 @@ public class PlayerWallRunning : MonoBehaviour
         horizontalInput = Input.GetAxisRaw("Horizontal");
         verticalInput = Input.GetAxisRaw("Vertical");
 
+        if (lg.holdingLedge)
+        {
+            if (pm.wallrunning) StopWallRun();
+        }
 
-        if ((wallLeft || wallRight) && verticalInput > 0 && AboveGround() && !exitingWall)
+
+        else if ((wallLeft || wallRight) && verticalInput > 0 && AboveGround() && !exitingWall)
         {
             if (!pm.wallrunning)
                 StartWallRun();
@@ -161,6 +168,8 @@ public class PlayerWallRunning : MonoBehaviour
 
     private void WallJump()
     {
+        if (lg.holdingLedge || lg.exitingLedge) return;
+
         exitingWall = true;
         exitWallTimer = exitWallTime;
 
