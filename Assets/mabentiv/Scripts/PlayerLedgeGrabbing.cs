@@ -40,6 +40,7 @@ public class PlayerLedgeGrabbing : MonoBehaviour
     [Header("Exiting")]
     [SerializeField] public bool exitingLedge;
     [SerializeField] private float exitLedgeTime;
+    [SerializeField] private float resetLastLedge;
     private float exitLedgeTimer;
 
     void Update()
@@ -58,11 +59,15 @@ public class PlayerLedgeGrabbing : MonoBehaviour
         if (holdingLedge)
         {
             FreezeRbOnLedge();
+
             timeOnLedge += Time.deltaTime;
 
-            if (timeOnLedge > minTimeOnLedge && Input.GetKeyDown(jumpKey))
-                LedgeJump();
-              
+            if (timeOnLedge > minTimeOnLedge && anyInputKeyPressed) ExitLedgeHold();
+
+
+            if (timeOnLedge > minTimeOnLedge && Input.GetKeyDown(jumpKey)) LedgeJump();
+
+
         }
 
         else if (exitingLedge) 
@@ -84,7 +89,7 @@ public class PlayerLedgeGrabbing : MonoBehaviour
 
         if (ledgeHit.transform == lastLedge) return;
 
-        if (distanceToLedge < maxLedgeGrabDistance && !holdingLedge) 
+        if (distanceToLedge < maxLedgeGrabDistance && !holdingLedge && !pm.grounded) 
             EnterLedgeHold();
 
     }
@@ -93,17 +98,18 @@ public class PlayerLedgeGrabbing : MonoBehaviour
     {
         Vector3 forceToAdd = cam.forward * ledgeJumpForwardForce + orientation.up * ledgeJumpUpwardForce;
         rb.velocity = Vector3.zero;
-        rb.AddForce(forceToAdd, ForceMode.Force);
+        rb.AddForce(forceToAdd, ForceMode.Impulse);
     }
 
     private void LedgeJump()
     {
         ExitLedgeHold();
-        DelayedJumpForce();
+        Invoke(nameof(DelayedJumpForce), 0.05f);
     }
 
     private void EnterLedgeHold()
     {
+        exitingLedge = false;
         holdingLedge = true;
 
         pm.unlimited = true;
@@ -125,7 +131,7 @@ public class PlayerLedgeGrabbing : MonoBehaviour
         if(distanceToLedge > 1f)
         {
             if (rb.velocity.magnitude < moveToLedgeSpeed)
-                rb.AddForce(directionToLedge.normalized * moveToLedgeSpeed * 1000f * Time.deltaTime);
+                rb.AddForce(1000f * moveToLedgeSpeed * Time.deltaTime * directionToLedge.normalized);
         }
 
         else
@@ -136,7 +142,6 @@ public class PlayerLedgeGrabbing : MonoBehaviour
 
             if (distanceToLedge > maxLedgeGrabDistance) 
                 ExitLedgeHold();
-
         }
     }
 
@@ -153,8 +158,17 @@ public class PlayerLedgeGrabbing : MonoBehaviour
 
         rb.useGravity = true;
 
-        Invoke(nameof(ResetLastLedge), 0.75f);
+        StopAllCoroutines();
+       //StartCoroutine(ResetLastLedge(resetLastLedge));
+        Invoke(nameof(ResetLastLedge), 1f);
 
+    }
+
+    private IEnumerator ResetLastLedge(float waitTime)
+    {
+        new WaitForSeconds(waitTime);
+        lastLedge = null;
+        yield return null;
     }
 
     private void ResetLastLedge()

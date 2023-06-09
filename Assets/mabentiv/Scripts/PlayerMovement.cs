@@ -65,7 +65,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] MovementState state;
     private bool sliding;
     
-    private bool grounded;
+    public bool grounded;
     
     public bool wallrunning;
 
@@ -124,7 +124,7 @@ public class PlayerMovement : MonoBehaviour
         verticalInput = Input.GetAxisRaw("Vertical");
 
         //Jumping
-        if (Input.GetKey(jumpKey) && readyToJump && !CheckCeiling() && (grounded || freeze))
+        if (Input.GetKey(jumpKey) && readyToJump && !CheckCeiling() && grounded)
         {
             readyToJump = false;
             ResetCrouch();
@@ -153,13 +153,12 @@ public class PlayerMovement : MonoBehaviour
         if (freeze)
         {
             state = MovementState.freeze;
-            moveSpeed = 0f;
             rb.velocity = Vector3.zero;
 
         } else if (unlimited)
         {
             state = MovementState.unlimited;
-            moveSpeed = 1000f;
+            moveSpeed = 999f;
             return;
         }
 
@@ -205,8 +204,6 @@ public class PlayerMovement : MonoBehaviour
 
         lastDesiredMoveSpeed = desiredMoveSpeed;
     }
-
-    //TO-DO: change to Mathf.SmoothDamp()
 
     private void MovePlayer()
     {
@@ -274,7 +271,7 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
-    private void Jump()
+    public void Jump()
     {
         exitingSlope = true;
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
@@ -294,7 +291,7 @@ public class PlayerMovement : MonoBehaviour
     {
         activeGrapple = true;
 
-        velocityToSet = CalculateJumpVelocity(transform.position, targetPostition, trajectoryHeight);
+        velocityToSet = CalculateJumpVelocity(transform.position, targetPostition + new Vector3(0f, 2f, 0f), trajectoryHeight);
 
         Invoke(nameof(SetVelocity), 0.1f);
     }
