@@ -39,6 +39,7 @@ public class PlayerWallRunning : MonoBehaviour
     [Header("References")]
     [SerializeField] private Transform orientation;
     [SerializeField] PlayerCamera cam;
+    [SerializeField] ParticleSystem speedLines;
     private PlayerMovement pm;
     private Rigidbody rb;
     private PlayerLedgeGrabbing lg;
@@ -131,9 +132,10 @@ public class PlayerWallRunning : MonoBehaviour
 
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
-        cam.DoFov(80f);
+        cam.DoFov(90f);
         if (wallLeft) cam.DoTilt(-5f);
         if (wallRight) cam.DoTilt(5f);
+        speedLines.Play();
 
     }
 
@@ -160,9 +162,10 @@ public class PlayerWallRunning : MonoBehaviour
     private void StopWallRun()
     {
         pm.wallrunning = false;
-        cam.DoFov(80f);
+        cam.DoFov(90f);
         cam.DoTilt(0f);
         cam.DoTilt(0f);
+        speedLines.Stop();
 
     }
 
@@ -179,5 +182,6 @@ public class PlayerWallRunning : MonoBehaviour
 
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
         rb.AddForce(forceToApply, ForceMode.Impulse);
+        
     }
 }
