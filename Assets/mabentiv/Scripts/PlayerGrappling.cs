@@ -31,6 +31,7 @@ public class PlayerGrappling : MonoBehaviour
     private void Start()
     {
         pm = GetComponent<PlayerMovement>();
+        lr.useWorldSpace = true;
     }
 
     private void Update()
