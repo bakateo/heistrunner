@@ -108,7 +108,6 @@ public class PlayerMovement : MonoBehaviour
             CheckCeiling();
         StateHandler();
         SpeedControl();
-        moveSpeedText.text = desiredMoveSpeed.ToString();
         HandleDrag();
     }
 
@@ -120,29 +119,33 @@ public class PlayerMovement : MonoBehaviour
 
     private void PlayerInput()
     {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-        verticalInput = Input.GetAxisRaw("Vertical");
 
-        //Jumping
-        if (Input.GetKey(jumpKey) && readyToJump && !CheckCeiling() && grounded)
+        if (!PlayerRespawn.playerDied)
         {
-            readyToJump = false;
-            ResetCrouch();
-            Jump();
-            Invoke(nameof(ResetJump), jumpCooldown);
+            horizontalInput = Input.GetAxisRaw("Horizontal");
+            verticalInput = Input.GetAxisRaw("Vertical");
 
+            //Jumping
+            if (Input.GetKey(jumpKey) && readyToJump && !CheckCeiling() && grounded)
+            {
+                readyToJump = false;
+                ResetCrouch();
+                Jump();
+                Invoke(nameof(ResetJump), jumpCooldown);
+
+            }
+            //Crouching
+            if (Input.GetKeyDown(crouchKey) && grounded)
+                Crouch();
+            if (Input.GetKeyUp(crouchKey) && grounded && !CheckCeiling())
+                ResetCrouch();
+
+            //Sliding
+            if (Input.GetKeyDown(slideKey) && (horizontalInput != 0 || verticalInput != 0) && !stillCrouching)
+                StartSlide();
+            if (Input.GetKeyUp(slideKey) && sliding)
+                StopSlide();
         }
-        //Crouching
-        if (Input.GetKeyDown(crouchKey) && grounded)
-            Crouch();
-        if (Input.GetKeyUp(crouchKey) && grounded && !CheckCeiling())
-            ResetCrouch();
-
-        //Sliding
-        if (Input.GetKeyDown(slideKey) && (horizontalInput != 0 || verticalInput != 0) && !stillCrouching)
-            StartSlide();
-        if (Input.GetKeyUp(slideKey) && sliding)
-            StopSlide();
 
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();
