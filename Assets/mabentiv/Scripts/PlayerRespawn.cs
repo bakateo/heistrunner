@@ -2,19 +2,23 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerRespawn : MonoBehaviour
 {
     [SerializeField] private Transform player;
     [SerializeField] private Rigidbody rb;
     [SerializeField] private Transform spawnPoint;
+    [SerializeField] private Canvas deathui;
     private Rigidbody playerRb;
+    private Canvas deathScreen;
 
     public static bool playerDied = false;
 
     private void Start()
     {
         playerRb = rb.GetComponent<Rigidbody>();
+        deathScreen = deathui.GetComponent<Canvas>();
     }
 
     private void Update()
@@ -24,14 +28,16 @@ public class PlayerRespawn : MonoBehaviour
 
     private void PauseGame()
     {
-        Time.timeScale = 0f;
+        deathScreen.gameObject.SetActive(true);
         playerDied = true;
+        Time.timeScale = 0f;
     }
 
     private void ResumeGame()
     {
         Time.timeScale = 1f;
         playerDied = false;
+        deathScreen.gameObject.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -54,6 +60,8 @@ public class PlayerRespawn : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.R) && playerDied)
             Respawn();
+        if (Input.GetKeyDown(KeyCode.Escape) && playerDied)
+            Application.Quit();
     }
 }
  
