@@ -61,7 +61,7 @@ public class PlayerGrappling : MonoBehaviour
 
         if (Physics.Raycast(cam.position, cam.forward, out hit, maxGrappleDistance, isGrappleable))
         {
-            grapplePoint = hit.point;
+            grapplePoint = hit.transform.gameObject.GetComponent<Renderer>().bounds.center;
 
             Invoke(nameof(ExecuteGrapple), grappleDelayTime);
         } else
@@ -79,7 +79,7 @@ public class PlayerGrappling : MonoBehaviour
     {
         pm.freeze = false;
 
-        Vector3 lowestPoint = new Vector3(transform.position.x, transform.position.y - 1f, transform.position.z);
+        Vector3 lowestPoint = new Vector3(transform.position.x, transform.position.y - 1, transform.position.z);
 
         float grapplePointRelativeYPos = grapplePoint.y - lowestPoint.y;
         float highestPointOnArc = grapplePointRelativeYPos + overshootYAxis;

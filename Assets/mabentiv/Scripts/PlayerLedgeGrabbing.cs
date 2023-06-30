@@ -125,7 +125,7 @@ public class PlayerLedgeGrabbing : MonoBehaviour
     private void FreezeRbOnLedge()
     {
         rb.useGravity = false;
-        Vector3 directionToLedge = currLedge.position - transform.position;
+        Vector3 directionToLedge = currLedge.GetComponent<Renderer>().bounds.center - transform.position;
         float distanceToLedge = Vector3.Distance(transform.position, currLedge.position);
 
         if(distanceToLedge > 1f)
