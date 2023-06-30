@@ -16,8 +16,10 @@ public class PlayerGrappling : MonoBehaviour
     [SerializeField] private float grappleDelayTime;
     [SerializeField] private float overshootYAxis;
 
-    private Vector3 grapplePoint;
+    protected Vector3 grapplePoint;
 
+    [Header("Animation")]
+    [SerializeField] private float animationDuration;
 
     [Header("Cooldown")]
     [SerializeField] float grapplingCoolDown;
@@ -26,7 +28,7 @@ public class PlayerGrappling : MonoBehaviour
     [Header("Input")]
     [SerializeField] KeyCode grappleKey = KeyCode.Mouse1;
 
-    private bool grappling;
+    protected bool grappling;
 
     private void Start()
     {
@@ -72,7 +74,10 @@ public class PlayerGrappling : MonoBehaviour
         }
 
         lr.enabled = true;
+        /*
         lr.SetPosition(1, grapplePoint);
+        */
+        StartCoroutine(AnimateLine(grapplePoint));
     }
 
     private void ExecuteGrapple()
@@ -102,5 +107,23 @@ public class PlayerGrappling : MonoBehaviour
         grapplingCDTimer = grapplingCoolDown;
 
         lr.enabled = false;
+    }
+
+    private IEnumerator AnimateLine (Vector3 grapplePoint)
+    {
+        float startTime = Time.time;
+        Vector3 startPosition = gunTip.position;
+        Vector3 endPosition = grapplePoint;
+
+        Vector3 pos = startPosition;
+        while (pos != endPosition)
+        {
+            float t = (Time.time - startTime) / animationDuration;
+            pos = Vector3.Lerp(startPosition, endPosition, t);
+            lr.SetPosition(1, pos);
+            yield return null;
+        }
+
+
     }
 }
