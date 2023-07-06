@@ -6,7 +6,7 @@ using DG.Tweening;
 public class PlayerCamera : MonoBehaviour
 {
     [SerializeField] private float sensitivity;
-
+    [SerializeField] private Camera playerCamera;
     [SerializeField] private Transform playerBody;
     [SerializeField] private Transform camHolder;
 

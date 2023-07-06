@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerGrappling : MonoBehaviour
 {
     [Header("References")]
     private PlayerMovement pm;
     [SerializeField] private Transform cam;
+    [SerializeField] private Image crosshair;
     [SerializeField] private Transform gunTip;
     [SerializeField] private LayerMask isGrappleable;
     [SerializeField] LineRenderer lr;
@@ -38,6 +40,12 @@ public class PlayerGrappling : MonoBehaviour
 
     private void Update()
     {
+
+        RaycastHit hit;
+
+        if (Physics.Raycast(cam.position, cam.forward, out hit, maxGrappleDistance, isGrappleable)) crosshair.color = Color.green;
+        else crosshair.color = Color.white;
+
         if (Input.GetKeyDown(grappleKey)) StartGrapple();
 
         if (grapplingCDTimer > 0)

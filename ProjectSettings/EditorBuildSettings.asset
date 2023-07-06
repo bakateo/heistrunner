@@ -6,9 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/TitleScreen.unity
+    path: Assets/mabentiv/Scenes/TitleScreen.unity
     guid: e67a4312e30d9314cb556a256ec3c221
   - enabled: 1
-    path: Assets/Scenes/TutorialScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/mabentiv/Scenes/FirstLevel.unity
+    guid: 3385d9c7eaf604c4eae15cc2b9532cd2
+  - enabled: 1
+    path: Assets/mabentiv/Scenes/Credit.unity
+    guid: 25b5d624ca2de234d93956eb845d239e
   m_configObjects: {}

@@ -61,7 +61,7 @@ public class PlayerRespawn : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R) && playerDied)
             Respawn();
         if (Input.GetKeyDown(KeyCode.Escape) && playerDied)
-            Application.Quit();
+            SceneManager.LoadScene(0);
     }
 }
  
