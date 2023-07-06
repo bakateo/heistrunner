@@ -8,8 +8,12 @@ public class PlayerRespawn : MonoBehaviour
 {
     [SerializeField] private Transform player;
     [SerializeField] private Rigidbody rb;
-    [SerializeField] private Transform spawnPoint;
     [SerializeField] private Canvas deathui;
+    [SerializeField] private float dead;
+    private List<Vector3> checkPoints = new List<Vector3>();
+    private Vector3 lastPoint;
+
+
     private Rigidbody playerRb;
     private Canvas deathScreen;
 
@@ -19,6 +23,8 @@ public class PlayerRespawn : MonoBehaviour
     {
         playerRb = rb.GetComponent<Rigidbody>();
         deathScreen = deathui.GetComponent<Canvas>();
+        lastPoint = player.transform.position;
+
     }
 
     private void Update()
@@ -42,7 +48,11 @@ public class PlayerRespawn : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("SpawnPoint"))
+        {
+            lastPoint = player.transform.position;
+
+        } else if (other.CompareTag("FallTrigger"))
         {
             PauseGame();
         }
@@ -50,7 +60,7 @@ public class PlayerRespawn : MonoBehaviour
 
     private void Respawn()
     {
-        player.transform.position = spawnPoint.gameObject.transform.position;
+        player.transform.position = lastPoint;
         playerRb.velocity = Vector3.zero;
         Physics.SyncTransforms();
         ResumeGame();
@@ -58,7 +68,7 @@ public class PlayerRespawn : MonoBehaviour
 
     private void PlayerInputRespawn()
     {
-        if (Input.GetKeyDown(KeyCode.R) && playerDied)
+        if (Input.GetKeyDown(KeyCode.R))
             Respawn();
         if (Input.GetKeyDown(KeyCode.Escape) && playerDied)
             SceneManager.LoadScene(0);
