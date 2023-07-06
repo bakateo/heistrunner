@@ -22218,7 +22218,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16384
   lr: {fileID: 117385827}
-  maxGrappleDistance: 35
+  maxGrappleDistance: 40
   grappleDelayTime: 0.5
   overshootYAxis: 2
   animationDuration: 0.25
@@ -45374,7 +45374,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh27448
+  m_Name: pb_Mesh65090
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
