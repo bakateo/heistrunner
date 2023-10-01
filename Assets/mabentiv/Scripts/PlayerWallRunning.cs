@@ -11,6 +11,8 @@ public class PlayerWallRunning : MonoBehaviour
     [SerializeField] private float wallJumpUpForce;
     [SerializeField] private float wallJumpSideForce;
     [SerializeField] private float maxWallRunTime;
+    [SerializeField] private float coyoteTime = 0.2f;
+    private float coyoteTimeCounter;
     private float wallRunTimer;
 
     [Header("Input")]
@@ -67,6 +69,16 @@ public class PlayerWallRunning : MonoBehaviour
     {
         wallRight = Physics.Raycast(transform.position, orientation.right, out rightWallhit, wallCheckDistance, isWall);
         wallLeft = Physics.Raycast(transform.position, -orientation.right, out leftWallhit, wallCheckDistance, isWall);
+
+        if(wallRight || wallLeft)
+        {
+            coyoteTimeCounter = coyoteTime;
+        }
+        else
+        {
+            coyoteTimeCounter -= Time.deltaTime;
+        }
+
     }
 
     private bool AboveGround()
@@ -98,9 +110,7 @@ public class PlayerWallRunning : MonoBehaviour
                 exitingWall = true;
                 exitWallTimer = exitWallTime;
             }
-
-            //wall jump
-            if (Input.GetKeyDown(jumpKey)) WallJump();
+          
         }
 
         else if (exitingWall)
@@ -113,7 +123,6 @@ public class PlayerWallRunning : MonoBehaviour
 
             if (exitWallTimer <= 0)
                 exitingWall = false;
-
         }
 
         else
@@ -122,6 +131,7 @@ public class PlayerWallRunning : MonoBehaviour
                 StopWallRun();
         }
 
+        if (Input.GetKeyDown(jumpKey) && coyoteTimeCounter > 0f) WallJump();
     }
 
     private void StartWallRun()

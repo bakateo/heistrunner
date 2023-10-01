@@ -25,6 +25,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float jumpForce;
     [SerializeField] private float jumpCooldown;
     [SerializeField] private float airMultiplier;
+    [SerializeField] private float coyoteTime;
+    private float coyoteTimeCounter;
     private bool readyToJump;
 
     [Header("Ground Check")]
@@ -91,7 +93,7 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
-        readyToJump = true;
+        readyToJump = false;
         grounded = false;
         wallrunning = false;
         stillCrouching = false;
@@ -126,14 +128,14 @@ public class PlayerMovement : MonoBehaviour
             verticalInput = Input.GetAxisRaw("Vertical");
 
             //Jumping
-            if (Input.GetKey(jumpKey) && readyToJump && !CheckCeiling() && grounded)
+            if (Input.GetKey(jumpKey) && readyToJump && !CheckCeiling() && coyoteTimeCounter > 0f)
             {
-                readyToJump = false;
                 ResetCrouch();
+                coyoteTimeCounter = 0f;
                 Jump();
                 Invoke(nameof(ResetJump), jumpCooldown);
-
             }
+
             //Crouching
             if (Input.GetKeyDown(crouchKey) && grounded)
                 Crouch();
@@ -228,8 +230,8 @@ public class PlayerMovement : MonoBehaviour
                 rb.AddForce(Vector3.down * 80f, ForceMode.Force);
         }
 
-        else if
-            (grounded) rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+        else if (grounded) 
+            rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
         else if (!grounded)
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
 
@@ -240,6 +242,13 @@ public class PlayerMovement : MonoBehaviour
     private void CheckGround()
     {
         grounded = Physics.CheckSphere(groundCheck.position, groundDistance, isGround);
+        if (grounded)
+        {
+            coyoteTimeCounter = coyoteTime;
+        } else
+        {
+            coyoteTimeCounter -= Time.deltaTime;
+        }
     }
 
     private void HandleDrag()
@@ -279,13 +288,14 @@ public class PlayerMovement : MonoBehaviour
         exitingSlope = true;
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+        readyToJump = false;
     }
 
     private void ResetJump()
     {
-        readyToJump = true;
         transform.localScale = new Vector3(transform.localScale.x, startYScale, transform.localScale.z);
         exitingSlope = false;
+        readyToJump = true;
     }
 
     private bool enableMovementOnNextTouch;
