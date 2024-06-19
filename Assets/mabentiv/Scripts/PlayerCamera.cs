@@ -38,4 +38,9 @@ public class PlayerCamera : MonoBehaviour
     {
         transform.DOLocalRotate(new Vector3(0, 0, zTilt), 0.25f);
     }
+
+    public void DoLookUp(float yTilt)
+    {
+        transform.DOLocalRotate(new Vector3(0, yTilt, 0), 0.25f);
+    }
 }

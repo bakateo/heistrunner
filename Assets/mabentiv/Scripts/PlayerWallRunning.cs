@@ -146,7 +146,6 @@ public class PlayerWallRunning : MonoBehaviour
         if (wallLeft) cam.DoTilt(-5f);
         if (wallRight) cam.DoTilt(5f);
         speedLines.Play();
-
     }
 
     private void WallRunningMovement()
@@ -176,7 +175,6 @@ public class PlayerWallRunning : MonoBehaviour
         cam.DoTilt(0f);
         cam.DoTilt(0f);
         speedLines.Stop();
-
     }
 
     private void WallJump()

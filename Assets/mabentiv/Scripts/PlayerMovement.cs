@@ -14,6 +14,11 @@ public class PlayerMovement : MonoBehaviour
     private float desiredMoveSpeed;
     private float lastDesiredMoveSpeed;
 
+    [Header("Camera")]
+    [SerializeField] private Transform orientation;
+    [SerializeField] PlayerCamera cam;
+    [SerializeField] ParticleSystem speedLines;
+
     [Header("Sliding")]
     [SerializeField] private float slidingSpeed;
     [SerializeField] private float maxSlideTime;
@@ -47,13 +52,11 @@ public class PlayerMovement : MonoBehaviour
     private RaycastHit slopeHit;
     private bool exitingSlope;
 
-    [SerializeField] private Transform orientation;
-
     [Header("Keybinds")]
     [SerializeField] private KeyCode jumpKey = KeyCode.Space;
     [SerializeField] private KeyCode sprintKey = KeyCode.LeftShift;
     [SerializeField] private KeyCode crouchKey = KeyCode.C;
-    [SerializeField] private KeyCode slideKey = KeyCode.LeftControl;
+    [SerializeField] private KeyCode slideKey = KeyCode.F;
 
     [Header("UI Logging")]
     [SerializeField] private TextMeshProUGUI moveSpeedText;
@@ -65,12 +68,11 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody rb;
 
     [SerializeField] MovementState state;
-    private bool sliding;
-    
-    public bool grounded;
-    
-    public bool wallrunning;
 
+
+    private bool sliding;
+    public bool grounded;
+    public bool wallrunning;
     public bool freeze;
     public bool unlimited;
     public bool restricted;
@@ -384,6 +386,9 @@ public class PlayerMovement : MonoBehaviour
         transform.localScale = new Vector3(transform.localScale.x, slideYScale, transform.localScale.z);
         rb.AddForce(Vector3.down * 5f, ForceMode.Impulse);
 
+        cam.DoFov(80f);
+        speedLines.Play();
+
         slideTimer = maxSlideTime;
     }
 
@@ -409,6 +414,10 @@ public class PlayerMovement : MonoBehaviour
         sliding = false;
         stillCrouching = true;
         CheckCeiling();
+
+        cam.DoFov(75f);
+        speedLines.Stop();
+
     }
 
     private Vector3 CalculateJumpVelocity(Vector3 startPoint, Vector3 endPoint, float trajectoryHeight)
