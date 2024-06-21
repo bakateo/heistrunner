@@ -1,13 +1,10 @@
 # heistrunner (WIP)
 A prototype made for the module "Computergames" in the summer semester of 2023. 
 
-![alt text](https://github.com/bakateo/heistrunner/main/Assets/mabentiv/Art/PICs&GIFs/MainMenu.png)
+<img src="Assets/mabentiv/Art/PICs&GIFs/MainMenu.png" alt="MainMenu" width="720"/>
 
 ## Description
 "Heistrunner" is a first-person jump 'n' run game in which players must parkour their way through obstacles and sneak into a heavily guarded building called the Megasafe to steal the city's greatest treasure. The obstacles can be mastered with abillities like sliding, wall running, edge climbing and covering geat distances with a grappling gun.
-
-![alt text](https://github.com/bakateo/heistrunner/main/Assets/mabentiv/Art/PICs&GIFs/heistrunnerdemo.gif)
-
 
 ## Roadmap
 - [x] Tutorial
@@ -27,3 +24,4 @@ A prototype made for the module "Computergames" in the summer semester of 2023.
 - [ ] Fix momentum
 - [ ] Endless mode (procedually generated plattforms)
 
+<img src="Assets/mabentiv/Art/PICs&GIFs/heistrunnerdemo.gif" alt="GameplayDemo" width="720"/>
