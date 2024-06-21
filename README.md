@@ -17,7 +17,7 @@ A prototype made for the module "Computergames" in the summer semester of 2023.
   - [ ] Auto respawn on death
   - [ ] Keymapping
      
-## Upload to Itch.io as Version 1.2
+### Upload to Itch.io as Version 1.2
 
 - [ ] Toon shader
 - [ ] Action animations
